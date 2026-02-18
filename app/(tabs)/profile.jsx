@@ -1,10 +1,23 @@
-import { Text, View } from "react-native";
+import { signOut } from "firebase/auth";
+import { Pressable, Text, View } from "react-native";
+import { auth } from "../../src/config/firebase";
 
 export default function Profile() {
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      // No manual navigation needed
+      // Auth listener will redirect to login
+    } catch (error) {
+      console.log("Logout Error:", error.message);
+    }
+  };
+
   return (
     <View className="flex-1 bg-white px-6 pt-16">
 
-
+      {/* Header */}
       <View className="mb-8">
         <Text className="text-xs font-bold tracking-widest text-violet-500 uppercase mb-2">
           Your Account
@@ -17,7 +30,7 @@ export default function Profile() {
         </Text>
       </View>
 
-
+      {/* Profile Info */}
       <View className="items-center mb-8">
         <View className="w-20 h-20 rounded-full bg-violet-100 border-2 border-violet-200 items-center justify-center mb-3">
           <Text className="text-3xl">✦</Text>
@@ -26,7 +39,7 @@ export default function Profile() {
         <Text className="text-gray-400 text-sm">luna@melooha.com</Text>
       </View>
 
-
+      {/* Details Card */}
       <View className="bg-gray-50 border border-gray-100 rounded-2xl overflow-hidden mb-4">
         {[
           { label: "Date of Birth", value: "12 / 06 / 1998" },
@@ -41,16 +54,29 @@ export default function Profile() {
             }`}
           >
             <Text className="text-gray-500 text-sm">{item.label}</Text>
-            <Text className="text-gray-900 text-sm font-semibold">{item.value}</Text>
+            <Text className="text-gray-900 text-sm font-semibold">
+              {item.value}
+            </Text>
           </View>
         ))}
       </View>
 
-
-      <View className="bg-violet-50 border border-violet-100 rounded-2xl px-5 py-4 flex-row justify-between items-center">
-        <Text className="text-violet-700 text-sm font-semibold">Edit Profile</Text>
+      {/* Edit Profile */}
+      <View className="bg-violet-50 border border-violet-100 rounded-2xl px-5 py-4 flex-row justify-between items-center mb-6">
+        <Text className="text-violet-700 text-sm font-semibold">
+          Edit Profile
+        </Text>
         <Text className="text-violet-400 text-base">›</Text>
       </View>
+
+      {/* Logout Button */}
+      <Pressable onPress={handleLogout}>
+        <View className="bg-red-50 border border-red-100 rounded-2xl px-5 py-4 flex-row justify-center items-center">
+          <Text className="text-red-600 text-sm font-semibold">
+            Logout
+          </Text>
+        </View>
+      </Pressable>
 
     </View>
   );
