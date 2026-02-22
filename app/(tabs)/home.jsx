@@ -1,9 +1,16 @@
+import { useRouter } from "expo-router";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import FeatureCard from "../../src/components/FeatureCard";
 import LifeAreaCard from "../../src/components/LifeAreaCard";
 import PrimaryFeatureCard from "../../src/components/PrimaryFeatureCard";
 
 export default function Home() {
+  const router = useRouter();
+
+  const goToFeature = (featureId) => {
+    router.push(`/feature/${featureId}`);
+  };
+
   return (
     <View className="flex-1 bg-white">
       <ScrollView
@@ -12,7 +19,7 @@ export default function Home() {
         contentContainerStyle={{ paddingBottom: 40 }}
       >
 
-        {/* ── Header ── */}
+
         <View className="px-6 pt-14 pb-5 bg-violet-50 border-b border-violet-100">
           <Text className="text-xs font-bold uppercase tracking-widest text-violet-500 mb-2">
             Dashboard
@@ -28,9 +35,9 @@ export default function Home() {
           </View>
         </View>
 
-        {/* ── Today's Planets ── */}
+
         <View className="px-6 mt-6">
-          <Text className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wide">Today's Planets</Text>
+          <Text className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wide">{"Today's Planets"}</Text>
           <View className="flex-row gap-3">
             <View className="flex-1 rounded-2xl bg-violet-50 border border-violet-100 p-3 items-center">
               <Text className="text-xl mb-1">🌙</Text>
@@ -50,12 +57,12 @@ export default function Home() {
           </View>
         </View>
 
-        {/* ── Primary Feature Card ── */}
+
         <View className="px-6 mt-6">
           <PrimaryFeatureCard />
         </View>
 
-        {/* ── Feature Cards ── */}
+
         <View className="px-6 mt-6">
           <Text className="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wide">Features</Text>
           <View className="gap-3">
@@ -63,26 +70,30 @@ export default function Home() {
               iconLabel="DH"
               title="Daily Horoscope"
               description="See your personalized guidance for today."
+              onPress={() => goToFeature("daily-horoscope")}
             />
             <FeatureCard
               iconLabel="CM"
               title="Compatibility Match"
               description="Check relationship harmony with detailed insights."
+              onPress={() => goToFeature("compatibility-match")}
             />
             <FeatureCard
               iconLabel="TR"
               title="Tarot Reading"
               description="Draw your cards and unlock symbolic direction."
+              onPress={() => goToFeature("tarot-reading")}
             />
             <FeatureCard
               iconLabel="BC"
               title="Birth Chart"
               description="Explore your natal placements and planetary positions."
+              onPress={() => goToFeature("birth-chart")}
             />
           </View>
         </View>
 
-        {/* ── Explore Life Areas ── */}
+
         <View className="mt-6">
           <View className="px-6 flex-row items-center justify-between mb-3">
             <Text className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Explore Life Areas</Text>

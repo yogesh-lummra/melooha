@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+// import Ionicons from '@expo/vector-icons/Ionicons';
 import { Tabs } from "expo-router";
 
 export default function TabLayout() {
@@ -36,6 +37,19 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size, focused }) => (
             <Ionicons
               name={focused ? "planet" : "planet-outline"}
+              size={22}
+              color={color}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="astrology_Tools"
+        options={{
+          title: "Astrology Tools",
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons name={"globe-outline"}
               size={22}
               color={color}
             />
