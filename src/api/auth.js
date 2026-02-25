@@ -1,6 +1,7 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "../config/firebase";
+import { getDefaultProfileImageByGender } from "../services/userService";
 
 export const signupUser = async (userData) => {
   const {
@@ -14,6 +15,9 @@ export const signupUser = async (userData) => {
     timeOfBirth,
     placeOfBirth,
   } = userData;
+
+  const fullName = [firstName, surname].filter(Boolean).join(" ").trim();
+  const profileImageUrl = getDefaultProfileImageByGender(gender);
 
   // 1. Create Auth Account
   const userCredential = await createUserWithEmailAndPassword(
@@ -29,13 +33,16 @@ export const signupUser = async (userData) => {
     uid: user.uid,
     firstName,
     surname,
+    fullName,
     age: Number(age),
     gender,
     dateOfBirth,
     timeOfBirth,
     placeOfBirth,
+    profileImageUrl,
     email,
     createdAt: new Date(),
+    updatedAt: new Date(),
   });
 
   return user;

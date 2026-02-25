@@ -1,8 +1,17 @@
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
 import "../global.css";
-import { useAuth } from "../src/hooks/useAuth";
+import { AuthProvider, useAuth } from "../src/hooks/useAuth";
+
 export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <RootNavigator />
+    </AuthProvider>
+  );
+}
+
+function RootNavigator() {
   const { user, loading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
@@ -13,7 +22,6 @@ export default function RootLayout() {
     const inAuthGroup = segments[0] === "(auth)";
     const inTabsGroup = segments[0] === "(tabs)";
 
-    console.log("Segments:", segments);
     if (!user && inTabsGroup) {
       router.replace("/(auth)/login");
     }
@@ -21,11 +29,19 @@ export default function RootLayout() {
     if (user && inAuthGroup) {
       router.replace("/(tabs)/home");
     }
+  }, [user, loading, segments, router]);
 
-  }, [user, loading, segments]);
-
-
-
-
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="index" />
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="(auth)" />
+      <Stack.Screen name="edit-profile" />
+      <Stack.Screen name="astrology/zodiac" />
+      <Stack.Screen name="astrology/lucky" />
+      <Stack.Screen name="astrology/compatibility" />
+      <Stack.Screen name="astrology/kundli-match" />
+      <Stack.Screen name="astrology/career" />
+    </Stack>
+  );
 }

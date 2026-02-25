@@ -3,11 +3,11 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
-  StatusBar,
   Text,
   TextInput,
   View,
 } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { loginUser } from "../../src/api/auth";
 
@@ -40,7 +40,7 @@ export default function LoginEmail() {
 
   return (
     <SafeAreaView className="flex-1 bg-white">
-      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+      <StatusBar hidden={true} />
 
       {/* Decorative Stars */}
       <View className="absolute top-20 left-10 w-3 h-3 bg-purple-400 rounded-full opacity-70" />
@@ -56,7 +56,7 @@ export default function LoginEmail() {
         {/* Logo */}
         <View className="items-center mt-8 mb-12">
           <View className="w-20 h-20 rounded-full bg-purple-600 items-center justify-center shadow-md shadow-purple-300/50">
-            <Text className="text-4xl">🌌</Text>
+            <Text className="text-4xl">??</Text>
           </View>
         </View>
 
@@ -158,7 +158,7 @@ export default function LoginEmail() {
                     <Text className="text-white text-center font-semibold text-lg mr-2">
                       Sign In
                     </Text>
-                    <Text className="text-white text-xl">→</Text>
+                    <Text className="text-white text-xl">?</Text>
                   </>
                 )}
               </View>

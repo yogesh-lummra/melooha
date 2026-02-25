@@ -1,83 +1,106 @@
 import { signOut } from "firebase/auth";
-import { Pressable, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { auth } from "../../src/config/firebase";
+import { useAuth } from "../../src/hooks/useAuth";
+import { resolveProfileImageUrl } from "../../src/services/userService";
 
 export default function Profile() {
+  const router = useRouter();
+  const { firebaseUser, profileData, loading } = useAuth();
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      // No manual navigation needed
-      // Auth listener will redirect to login
-    } catch (error) {
-      console.log("Logout Error:", error.message);
+    } catch {
+      Alert.alert("Logout Failed", "Unable to logout right now. Please try again.");
     }
   };
 
+  if (loading || !profileData) {
+    return (
+      <View className="flex-1 items-center justify-center bg-white px-6">
+        <ActivityIndicator size="large" color="#7c3aed" />
+        <Text className="mt-4 text-sm text-gray-500">Loading profile...</Text>
+      </View>
+    );
+  }
+
+  const fullName = profileData?.fullName?.trim()
+    ? profileData.fullName.trim()
+    : [profileData?.firstName, profileData?.surname].filter(Boolean).join(" ").trim() ||
+      "No Name";
+
+  const rows = [
+    { label: "Age", value: profileData?.age ? String(profileData.age) : "Not provided" },
+    { label: "Gender", value: profileData?.gender || "Not provided" },
+    { label: "Birth Date", value: profileData?.dateOfBirth || "Not provided" },
+    { label: "Birth Time", value: profileData?.timeOfBirth || "Not provided" },
+    { label: "Birth Place", value: profileData?.placeOfBirth || "Not provided" },
+  ];
+
   return (
     <View className="flex-1 bg-white px-6 pt-16">
-
-      {/* Header */}
-      <View className="mb-8">
-        <Text className="text-xs font-bold tracking-widest text-violet-500 uppercase mb-2">
-          Your Account
-        </Text>
-        <Text className="text-3xl font-bold text-gray-900">
-          Profile
-        </Text>
-        <Text className="text-gray-400 text-sm mt-1">
-          Manage your cosmic identity
-        </Text>
-      </View>
-
-      {/* Profile Info */}
       <View className="items-center mb-8">
-        <View className="w-20 h-20 rounded-full bg-violet-100 border-2 border-violet-200 items-center justify-center mb-3">
-          <Text className="text-3xl">✦</Text>
-        </View>
-        <Text className="text-gray-900 text-lg font-bold">Luna Starr</Text>
-        <Text className="text-gray-400 text-sm">luna@melooha.com</Text>
+        <Image
+          source={{ uri: resolveProfileImageUrl(profileData) }}
+          style={styles.profileImage}
+        />
+        <Text className="mt-4 text-2xl font-bold text-gray-900">{fullName}</Text>
+        <Text className="mt-1 text-sm text-gray-400">
+          {firebaseUser?.email || profileData?.email || "No email"}
+        </Text>
+
+        <Pressable
+          onPress={() => router.push("/edit-profile")}
+          className="mt-5 rounded-2xl border border-violet-200 bg-violet-50 px-6 py-3"
+        >
+          <Text className="text-sm font-semibold text-violet-700">Edit Profile</Text>
+        </Pressable>
       </View>
 
-      {/* Details Card */}
-      <View className="bg-gray-50 border border-gray-100 rounded-2xl overflow-hidden mb-4">
-        {[
-          { label: "Date of Birth", value: "12 / 06 / 1998" },
-          { label: "Time of Birth", value: "08:30 AM" },
-          { label: "Place of Birth", value: "Mumbai, India" },
-          { label: "Gender", value: "Female" },
-        ].map((item, index, arr) => (
+      <View className="rounded-2xl border border-gray-100 bg-gray-50 overflow-hidden mb-6">
+        {rows.map((item, index) => (
           <View
             key={item.label}
-            className={`px-5 py-4 flex-row justify-between items-center ${
-              index !== arr.length - 1 ? "border-b border-gray-100" : ""
+            className={`px-5 py-4 flex-row items-center ${
+              index !== rows.length - 1 ? "border-b border-gray-100" : ""
             }`}
           >
-            <Text className="text-gray-500 text-sm">{item.label}</Text>
-            <Text className="text-gray-900 text-sm font-semibold">
+            <Text className="text-gray-500 text-sm w-28">{item.label}</Text>
+            <Text className="text-gray-900 text-sm font-semibold flex-1 text-right ml-4" numberOfLines={2}>
               {item.value}
             </Text>
           </View>
         ))}
       </View>
 
-      {/* Edit Profile */}
-      <View className="bg-violet-50 border border-violet-100 rounded-2xl px-5 py-4 flex-row justify-between items-center mb-6">
-        <Text className="text-violet-700 text-sm font-semibold">
-          Edit Profile
-        </Text>
-        <Text className="text-violet-400 text-base">›</Text>
-      </View>
-
-      {/* Logout Button */}
       <Pressable onPress={handleLogout}>
         <View className="bg-red-50 border border-red-100 rounded-2xl px-5 py-4 flex-row justify-center items-center">
-          <Text className="text-red-600 text-sm font-semibold">
-            Logout
-          </Text>
+          <Text className="text-red-600 text-sm font-semibold">Logout</Text>
         </View>
       </Pressable>
-
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 6,
+  },
+});
