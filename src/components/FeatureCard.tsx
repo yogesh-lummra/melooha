@@ -11,19 +11,31 @@ export default function FeatureCard({ title, description, iconLabel, onPress }: 
   return (
     <Pressable
       onPress={onPress}
-      className="mb-3 rounded-2xl border border-violet-100 bg-white p-4 shadow-sm active:bg-violet-50"
+      className="rounded-2xl bg-white px-5 py-5 border border-gray-500"
     >
-      <View className="flex-row items-center">
-        <View className="mr-3 h-10 w-10 items-center justify-center rounded-full border border-violet-200 bg-violet-100">
-          <Text className="text-xs font-bold text-violet-700">{iconLabel}</Text>
-        </View>
+      {({ pressed }) => (
+        <View
+          className={`flex-row items-center ${pressed ? "opacity-70" : "opacity-100"}`}
+        >
+          {/* Icon */}
+          <View className="h-12 w-12 items-center justify-center rounded-xl bg-violet-100">
+            <Text className="text-xs font-extrabold tracking-wide text-violet-700">
+              {iconLabel}
+            </Text>
+          </View>
 
-        <View className="flex-1">
-          <Text className="text-base font-semibold text-gray-900">{title}</Text>
-          <Text className="mt-1 text-sm text-gray-500">{description}</Text>
+          {/* Text content */}
+          <View className="ml-4 flex-1">
+            <Text className="text-[15px] font-bold text-gray-900">{title}</Text>
+            <Text className="mt-1 text-sm leading-5 text-gray-500" numberOfLines={2}>
+              {description}
+            </Text>
+          </View>
+
+          {/* Arrow */}
+          <Text className="ml-3 text-lg text-gray-300">›</Text>
         </View>
-        <Text className="ml-2 text-lg text-violet-300">{">"}</Text>
-      </View>
+      )}
     </Pressable>
   );
 }

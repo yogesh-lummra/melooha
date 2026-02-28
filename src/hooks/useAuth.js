@@ -37,8 +37,14 @@ export const AuthProvider = ({ children }) => {
   }, [firebaseUser?.uid]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setLoading(true);
+    let isMounted = true;
+    let activeRequestId = 0;
+
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      const requestId = ++activeRequestId;
+
+      if (!isMounted) return;
+
       setFirebaseUser(currentUser);
 
       if (!currentUser) {
@@ -47,17 +53,28 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      try {
-        const profile = await getUserProfile(currentUser.uid);
-        setProfileData(profile);
-      } catch {
-        setProfileData(null);
-      } finally {
-        setLoading(false);
-      }
+      setLoading(true);
+
+      getUserProfile(currentUser.uid)
+        .then((profile) => {
+          if (!isMounted || requestId !== activeRequestId) return;
+          setProfileData(profile);
+        })
+        .catch(() => {
+          if (!isMounted || requestId !== activeRequestId) return;
+          setProfileData(null);
+        })
+        .finally(() => {
+          if (!isMounted || requestId !== activeRequestId) return;
+          setLoading(false);
+        });
     });
 
-    return unsubscribe;
+    return () => {
+      isMounted = false;
+      activeRequestId += 1;
+      unsubscribe();
+    };
   }, []);
 
   const value = useMemo(

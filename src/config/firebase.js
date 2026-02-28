@@ -9,13 +9,13 @@ import {
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 
 const firebaseConfig = {
-   apiKey: "AIzaSyDtreNWxcfPrrkak58-qLlkYuNE5MsLymE",
-   authDomain: "melooha-e7c54.firebaseapp.com",
-   projectId: "melooha-e7c54",
-   storageBucket: "melooha-e7c54.firebasestorage.app",
-   messagingSenderId: "222377696882",
-   appId: "1:222377696882:web:6b35a0bf78ab5f23cbaceb",
-   measurementId: "G-JX15FMQ4WK"
+   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+   authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+   projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+   storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+   messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
+   measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 const app = initializeApp(firebaseConfig);

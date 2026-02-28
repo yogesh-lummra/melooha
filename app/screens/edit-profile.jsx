@@ -1,5 +1,6 @@
 import { useRouter } from "expo-router";
 import { useEffect, useMemo, useState } from "react";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import {
   ActivityIndicator,
   Alert,
@@ -9,11 +10,11 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { useAuth } from "../src/hooks/useAuth";
+import { useAuth } from "../../src/hooks/useAuth";
 import {
   DEFAULT_PROFILE_IMAGE_URL,
   updateUserProfile,
-} from "../src/services/userService";
+} from "../../src/services/userService";
 
 const buildFullName = (profileData) => {
   if (!profileData) return "";
@@ -25,6 +26,50 @@ const buildFullName = (profileData) => {
     .trim();
 };
 
+const formatDate = (date) => {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`;
+};
+
+const formatTime = (date) => {
+  const hours24 = date.getHours();
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const period = hours24 >= 12 ? "PM" : "AM";
+  const hours12 = hours24 % 12 || 12;
+
+  return `${String(hours12).padStart(2, "0")}:${minutes} ${period}`;
+};
+
+const parseDateString = (value) => {
+  const parts = String(value || "").split("/");
+  if (parts.length !== 3) return new Date();
+
+  const day = Number(parts[0]);
+  const month = Number(parts[1]);
+  const year = Number(parts[2]);
+  if (!day || !month || !year) return new Date();
+
+  const parsedDate = new Date(year, month - 1, day);
+  return Number.isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
+};
+
+const parseTimeString = (value) => {
+  const match = String(value || "").trim().match(/^(\d{1,2}):(\d{2})\s?(AM|PM)$/i);
+  if (!match) return new Date();
+
+  const base = new Date();
+  let hours = Number(match[1]) % 12;
+  const minutes = Number(match[2]);
+  const period = match[3].toUpperCase();
+  if (period === "PM") hours += 12;
+
+  base.setHours(hours, minutes, 0, 0);
+  return base;
+};
+
 export default function EditProfileScreen() {
   const router = useRouter();
   const { firebaseUser, profileData, loading, refreshProfile } = useAuth();
@@ -33,6 +78,10 @@ export default function EditProfileScreen() {
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [birthTime, setBirthTime] = useState("");
   const [birthLocation, setBirthLocation] = useState("");
+  const [dobDate, setDobDate] = useState(new Date());
+  const [birthTimeDate, setBirthTimeDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const initialValues = useMemo(
@@ -50,7 +99,25 @@ export default function EditProfileScreen() {
     setDateOfBirth(initialValues.dateOfBirth);
     setBirthTime(initialValues.birthTime);
     setBirthLocation(initialValues.birthLocation);
+    setDobDate(parseDateString(initialValues.dateOfBirth));
+    setBirthTimeDate(parseTimeString(initialValues.birthTime));
   }, [initialValues]);
+
+  const handleDateChange = (_event, selectedDate) => {
+    setShowDatePicker(false);
+    if (!selectedDate) return;
+
+    setDobDate(selectedDate);
+    setDateOfBirth(formatDate(selectedDate));
+  };
+
+  const handleTimeChange = (_event, selectedTime) => {
+    setShowTimePicker(false);
+    if (!selectedTime) return;
+
+    setBirthTimeDate(selectedTime);
+    setBirthTime(formatTime(selectedTime));
+  };
 
   const handleSave = async () => {
     const trimmedName = fullName.trim();
@@ -90,7 +157,7 @@ export default function EditProfileScreen() {
     }
   };
 
-  if (loading || !profileData) {
+  if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white px-6">
         <ActivityIndicator size="large" color="#7c3aed" />
@@ -112,7 +179,7 @@ export default function EditProfileScreen() {
       <Text className="mt-1 text-sm text-gray-500">Update your personal and birth details.</Text>
 
       <View className="mt-8 rounded-2xl border border-gray-100 bg-gray-50 p-5">
-        <Text className="text-xs font-semibold text-gray-500 mb-2">Full Name</Text>
+        <Text className="mb-2 text-xs font-semibold text-gray-500">Full Name</Text>
         <TextInput
           value={fullName}
           onChangeText={setFullName}
@@ -121,25 +188,43 @@ export default function EditProfileScreen() {
           placeholderTextColor="#9ca3af"
         />
 
-        <Text className="text-xs font-semibold text-gray-500 mb-2 mt-5">Birth Date</Text>
-        <TextInput
-          value={dateOfBirth}
-          onChangeText={setDateOfBirth}
-          placeholder="DD / MM / YYYY"
-          className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900"
-          placeholderTextColor="#9ca3af"
-        />
+        <Text className="mb-2 mt-5 text-xs font-semibold text-gray-500">Birth Date</Text>
+        <Pressable
+          onPress={() => setShowDatePicker(true)}
+          className="rounded-xl border border-gray-200 bg-white px-4 py-3"
+        >
+          <Text className={`text-sm ${dateOfBirth ? "text-gray-900" : "text-gray-400"}`}>
+            {dateOfBirth || "Select date"}
+          </Text>
+        </Pressable>
+        {showDatePicker && (
+          <DateTimePicker
+            value={dobDate}
+            mode="date"
+            display="default"
+            onChange={handleDateChange}
+          />
+        )}
 
-        <Text className="text-xs font-semibold text-gray-500 mb-2 mt-5">Birth Time</Text>
-        <TextInput
-          value={birthTime}
-          onChangeText={setBirthTime}
-          placeholder="HH : MM"
-          className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900"
-          placeholderTextColor="#9ca3af"
-        />
+        <Text className="mb-2 mt-5 text-xs font-semibold text-gray-500">Birth Time</Text>
+        <Pressable
+          onPress={() => setShowTimePicker(true)}
+          className="rounded-xl border border-gray-200 bg-white px-4 py-3"
+        >
+          <Text className={`text-sm ${birthTime ? "text-gray-900" : "text-gray-400"}`}>
+            {birthTime || "Select time"}
+          </Text>
+        </Pressable>
+        {showTimePicker && (
+          <DateTimePicker
+            value={birthTimeDate}
+            mode="time"
+            display="default"
+            onChange={handleTimeChange}
+          />
+        )}
 
-        <Text className="text-xs font-semibold text-gray-500 mb-2 mt-5">Birth Place</Text>
+        <Text className="mb-2 mt-5 text-xs font-semibold text-gray-500">Birth Place</Text>
         <TextInput
           value={birthLocation}
           onChangeText={setBirthLocation}
@@ -157,7 +242,7 @@ export default function EditProfileScreen() {
         {saving ? (
           <ActivityIndicator color="#ffffff" />
         ) : (
-          <Text className="text-center text-white text-sm font-semibold">Save Changes</Text>
+          <Text className="text-center text-sm font-semibold text-white">Save Changes</Text>
         )}
       </Pressable>
     </ScrollView>

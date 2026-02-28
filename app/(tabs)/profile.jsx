@@ -25,7 +25,7 @@ export default function Profile() {
     }
   };
 
-  if (loading || !profileData) {
+  if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-white px-6">
         <ActivityIndicator size="large" color="#7c3aed" />
@@ -60,10 +60,16 @@ export default function Profile() {
         </Text>
 
         <Pressable
-          onPress={() => router.push("/edit-profile")}
+          onPress={() => router.push("/screens/edit-profile")}
           className="mt-5 rounded-2xl border border-violet-200 bg-violet-50 px-6 py-3"
         >
           <Text className="text-sm font-semibold text-violet-700">Edit Profile</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => router.push("/screens/astrology-history")}
+          className="mt-3 rounded-2xl border border-violet-200 bg-white px-6 py-3"
+        >
+          <Text className="text-sm font-semibold text-violet-700">Astrology History</Text>
         </Pressable>
       </View>
 

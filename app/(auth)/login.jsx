@@ -26,7 +26,6 @@ export default function LoginEmail() {
     try {
       setLoading(true);
       setError("");
-      console.log(email,password);
       await loginUser(email, password);
 
       // No router.push here
@@ -173,14 +172,11 @@ export default function LoginEmail() {
           </View>
 
           {/* Switch to Phone Login */}
-          <Pressable
-            onPress={() => router.push("/login")}
-            className="items-center"
-          >
+          <Pressable onPress={() => router.replace("/signup")} className="items-center">
             <Text className="text-gray-600 text-sm">
-              Prefer OTP?{" "}
+              New here?{" "}
               <Text className="text-purple-600 font-semibold underline">
-                Login with Phone
+                Create Account
               </Text>
             </Text>
           </Pressable>

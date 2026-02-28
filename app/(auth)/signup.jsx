@@ -12,6 +12,8 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { signupUser } from "../../src/api/auth";
+import { auth } from "../../src/config/firebase";
+import { signOut } from "firebase/auth";
 
 const formatDate = (date) => {
   const day = String(date.getDate()).padStart(2, "0");
@@ -102,6 +104,7 @@ const Signup = () => {
       };
 
       await signupUser(userData);
+      await signOut(auth);
 
       Alert.alert(
         "Account Created",
@@ -375,7 +378,7 @@ const Signup = () => {
             )}
           </Pressable>
 
-          <Pressable onPress={() => router.push("/login")} className="mb-2">
+          <Pressable onPress={() => router.replace("/login")} className="mb-2">
             <Text className="text-center text-gray-500 text-xs">
               Already have an account?{" "}
               <Text className="text-violet-600 font-semibold underline">Sign In</Text>
